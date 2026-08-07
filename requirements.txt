@@ -1,0 +1,8 @@
+qdrant-client
+fastembed
+pymupdf4llm
+langgraph
+ollama
+streamlit
+numpy
+tqdm
