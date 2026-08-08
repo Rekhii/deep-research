@@ -309,3 +309,30 @@ def ingest_pdf(client, pdf_path, batch_size=64):
         client.upsert(collection_name=COLLECTION, points=points)
 
     return len(pairs)
+
+
+def main():
+    '''
+    Indexes every PDF in the papers directory.
+    '''
+    client = get_client()
+    ensure_collection(client)
+
+    pdfs = find_pdfs()
+    if not pdfs:
+        print(f"No PDFs found in {PAPERS_DIR}")
+        return
+
+    total = 0
+    for pdf in pdfs:
+        n = ingest_pdf(client, pdf)
+        total += n
+        print(f"{n:5d}  {pdf.name}")
+
+    print(f"\n{total} chunks across {len(pdfs)} papers")
+    print(client.count(COLLECTION))
+    client.close()
+
+
+if __name__ == "__main__":
+    main()
