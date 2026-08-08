@@ -1,5 +1,7 @@
-import re
 from pathlib import Path
+import hashlib
+from src.config import PAPERS_DIR
+import re
 import pymupdf4llm
 from src.config import CHUNK_SIZE, CHUNK_OVERLAP
 
@@ -39,8 +41,9 @@ def clean(md):
     This function cleans the extracted Markdown by removing
     unnecessary formatting and reducing extra blank lines.
     '''
-    md = md.replace("**", "")
-    md = re.sub(r"\n{3,}", "\n\n", md)
+    md = md.replace("**", "")                                              # Remove bold markers
+    md = re.sub(r"(?<!\w)_|_(?!\w)", "", md)                   # Remove italic markers, keep underscores inside words
+    md = re.sub(r"\n{3,}", "\n\n", md)                         # Collapse runs of blank lines to a single break
     return md
 
 
@@ -113,7 +116,6 @@ def split_long(para):
     return pieces                                                # Return all smaller pieces
 
 
-
 def chunk_section(body):
     '''
     Takes one section body as input and splits it into
@@ -135,13 +137,68 @@ def chunk_section(body):
         else:
             chunks.append(current)                                                  # Save the completed chunk
 
-            tail = current[-CHUNK_OVERLAP:] if CHUNK_OVERLAP else ""
-                                                                                    # Take the last part of previous chunk as overlap
+            tail = current[-CHUNK_OVERLAP:] if CHUNK_OVERLAP else ""                # Take the last part of previous chunk as overlap
+            tail = tail.split(" ", 1)[-1] if " " in tail else tail                  # Snap overlap to a whole word, no mid-word cuts
 
-            current = (tail + "\n\n" + para).strip() if tail else para
-                                                                                    # Start new chunk with overlap + new paragraph
+            current = (tail + "\n\n" + para).strip() if tail else para              # Start new chunk with overlap + new paragraph
 
     if current:
         chunks.append(current)                                                      # Save the final chunk after the loop ends
 
     return chunks                                                                   # Return the list of all created chunks
+
+def file_hash(path):
+    '''
+    Returns a short hash of the file contents, used to detect
+    whether a paper has already been indexed.
+    '''
+
+    h = hashlib.sha256()                                      # Create a SHA-256 hash object
+
+    with open(path, "rb") as f:                               # Open the file in binary mode
+
+        for block in iter(lambda: f.read(65536), b""):        # Read the file in 65,536-byte blocks until the file ends
+            h.update(block)                                   # Add each block to the hash calculation
+
+    return h.hexdigest()[:16]                                 # Convert hash to text and return only the first 16 characters
+
+
+
+def iter_chunks(pdf_path):
+    '''
+    Parses one PDF and yields (text, payload) pairs, where payload
+    carries the metadata needed for citations and filtering.
+    '''
+
+    pdf_path = Path(pdf_path)                                 # Convert the given PDF path into a Path object
+    doc_id = file_hash(pdf_path)                              # Create a unique ID for this PDF using its file contents
+    paper = pdf_path.stem                                     # Get the PDF filename without the .pdf extension
+
+    md = clean(load_markdown(pdf_path))                       # Convert PDF to Markdown and clean the extracted text
+    index = 0                                                 # Keeps track of the chunk number inside this paper
+
+    for title, body in split_sections(md):                    # Loop through each detected section of the paper
+
+        for text in chunk_section(body):                      # Split each section body into smaller searchable chunks
+
+            payload = {                                       # Metadata stored together with each chunk
+                "paper": paper,                               # Paper name
+                "section": title,                             # Section where this chunk came from
+                "chunk_index": index,                         # Unique chunk position inside this paper
+                "doc_id": doc_id,                             # Unique identifier for the PDF
+                "text": text,                                 # Actual chunk text
+            }
+
+            yield text, payload                               # Return one chunk and its metadata at a time
+            index += 1                                        # Move to the next chunk number
+
+
+def find_pdfs():
+    '''
+    Returns every PDF in the papers directory, sorted for stable ordering.
+    '''
+
+    return sorted(PAPERS_DIR.glob("*.pdf"))   # Find all .pdf files inside PAPERS_DIR and return them in sorted order
+
+
+
