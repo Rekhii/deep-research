@@ -4,6 +4,26 @@ from src.config import PAPERS_DIR
 import re
 import pymupdf4llm
 from src.config import CHUNK_SIZE, CHUNK_OVERLAP
+from qdrant_client import QdrantClient, models
+from src.config import (
+    CHUNK_SIZE,
+    CHUNK_OVERLAP,
+    PAPERS_DIR,
+    DATA_DIR,
+    COLLECTION,
+    DENSE_MODEL,
+    DENSE_DIM,
+    SPARSE_MODEL,
+    QDRANT_PATH,
+)
+
+from fastembed import TextEmbedding, SparseTextEmbedding
+import uuid
+
+
+
+_dense = None
+_sparse = None
 
 
 # A real section heading
@@ -202,3 +222,90 @@ def find_pdfs():
 
 
 
+def get_client():
+    '''
+    Opens the embedded Qdrant database stored on local disk.
+    '''
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    return QdrantClient(path=QDRANT_PATH)
+
+
+def ensure_collection(client):
+    '''
+    Creates the collection with one dense and one sparse named vector
+    if it does not already exist.
+    '''
+    if client.collection_exists(COLLECTION):
+        return
+
+    client.create_collection(
+        collection_name=COLLECTION,
+        vectors_config={
+            "dense": models.VectorParams(
+                size=DENSE_DIM,
+                distance=models.Distance.COSINE,
+            )
+        },
+        sparse_vectors_config={
+            "sparse": models.SparseVectorParams()
+        },
+    )
+
+
+
+def get_models():
+    '''
+    Loads the dense and sparse embedding models once and reuses them.
+    '''
+    global _dense, _sparse
+    if _dense is None:
+        _dense = TextEmbedding(DENSE_MODEL)
+    if _sparse is None:
+        _sparse = SparseTextEmbedding(SPARSE_MODEL)
+    return _dense, _sparse
+
+
+
+def make_point_id(doc_id, chunk_index):
+    '''
+    Builds a deterministic UUID from the document hash and chunk position,
+    so re-ingesting the same paper overwrites instead of duplicating.
+    '''
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, f"{doc_id}:{chunk_index}"))
+
+
+def ingest_pdf(client, pdf_path, batch_size=64):
+    '''
+    Parses one PDF, embeds its chunks, and writes them to Qdrant.
+    '''
+    dense_model, sparse_model = get_models()
+    pairs = list(iter_chunks(pdf_path))
+    if not pairs:
+        return 0
+
+    for start in range(0, len(pairs), batch_size):
+        batch = pairs[start:start + batch_size]
+        texts = [t for t, _ in batch]
+
+        dense_vecs = list(dense_model.embed(texts))
+        sparse_vecs = list(sparse_model.embed(texts))
+
+        points = []
+        for (text, payload), dv, sv in zip(batch, dense_vecs, sparse_vecs):
+            points.append(
+                models.PointStruct(
+                    id=make_point_id(payload["doc_id"], payload["chunk_index"]),
+                    vector={
+                        "dense": dv.tolist(),
+                        "sparse": models.SparseVector(
+                            indices=sv.indices.tolist(),
+                            values=sv.values.tolist(),
+                        ),
+                    },
+                    payload=payload,
+                )
+            )
+
+        client.upsert(collection_name=COLLECTION, points=points)
+
+    return len(pairs)
