@@ -218,7 +218,7 @@ def find_pdfs():
     Returns every PDF in the papers directory, sorted for stable ordering.
     '''
 
-    return sorted(PAPERS_DIR.glob("*.pdf"))   # Find all .pdf files inside PAPERS_DIR and return them in sorted order
+    return sorted(PAPERS_DIR.glob("*.pdf"))                   # Find all .pdf files inside PAPERS_DIR and return them in sorted order
 
 
 
