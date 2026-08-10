@@ -8,6 +8,7 @@ from src.config import (
     SPARSE_MODEL,
     CANDIDATES,
     RERANK_MODEL,
+    RRF_K,
     TOP_K,
 )
 
@@ -94,7 +95,7 @@ def sparse_search(query, limit=CANDIDATES):
 
 
 # Reciprocal Rank Fusion
-def rrf_fuse(rankings, k=60, limit=CANDIDATES):                     # 60 in RRF is a constant that reduces how much difference there is between nearby ranks.
+def rrf_fuse(rankings, k=RRF_K, limit=CANDIDATES):                     # 60 in RRF is a constant that reduces how much difference there is between nearby ranks.
     """
     Merge multiple ranked result lists using Reciprocal Rank Fusion (RRF).
     Only the position/rank of a result matters, not its original score.

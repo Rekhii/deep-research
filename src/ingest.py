@@ -55,15 +55,17 @@ def load_markdown(pdf_path):
     '''
     return pymupdf4llm.to_markdown(str(pdf_path))
 
-
 def clean(md):
     '''
     This function cleans the extracted Markdown by removing
     unnecessary formatting and reducing extra blank lines.
     '''
-    md = md.replace("**", "")                                              # Remove bold markers
-    md = re.sub(r"(?<!\w)_|_(?!\w)", "", md)                   # Remove italic markers, keep underscores inside words
-    md = re.sub(r"\n{3,}", "\n\n", md)                         # Collapse runs of blank lines to a single break
+    md = md.replace("**", "")                                               # Remove bold markers
+    md = re.sub(r"(?<!\w)_|_(?!\w)", "", md)                    # Remove italic markers, keep underscores inside words
+    md = re.sub(r"\n{3,}", "\n\n", md)                          # Collapse runs of blank lines to a single break
+    md = re.sub(r"(?<![\w.])\d(?=[A-Z][a-z]|[A-Z]{3})", "", md)         # Strip glued leading digit
+    md = re.sub(r"\bLIDA[A-Za-z]{1,2}(?![A-Za-z])", "LIDA", md) # Strip glued trailing marker
+
     return md
 
 
@@ -310,6 +312,21 @@ def ingest_pdf(client, pdf_path, batch_size=64):
 
     return len(pairs)
 
+def clean_text(text: str) -> str:
+    """
+    Strips PDF extraction artifacts from parsed markdown.
+
+    pymupdf4llm flattens superscripts into the baseline, so footnote and
+    trademark markers end up glued to the preceding word. "LIDA" plus a
+    superscript C becomes "LIDAC", which the tokenizer then treats as a
+    completely different term from "LIDA" in both dense and sparse search.
+    """
+    # Only strip when the marker is 1-2 letters AND the next character is
+    # not a letter. This protects any real word starting with those letters
+    # from being silently truncated.
+    text = re.sub(r"\bLIDA[A-Za-z]{1,2}\b", "LIDA", text)
+
+    return text
 
 def main():
     '''
