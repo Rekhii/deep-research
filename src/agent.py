@@ -273,3 +273,75 @@ Is this claim supported by the context above?"""
     return {"critique": critique, "revision_attempts": attempts + 1}
 
 
+def route_after_grade(state: State) -> str:
+    """
+    Retrieval correction loop. Decides whether to answer or search again.
+
+    Returns a node name. LangGraph calls this after grade_node and sends
+    control wherever the string points.
+    """
+    # Cap first, before looking at the verdict. Two failed retrievals means
+    # the query is not the problem and rewriting again just burns time.
+    # Better to answer honestly from weak context than loop forever.
+    if state["retrieval_attempts"] >= 2:
+        return "write"
+
+    if state["verdict"] == "insufficient":
+        return "rewrite"
+
+    return "write"
+
+
+def route_after_critique(state: State) -> str:
+    """
+    Revision loop. Decides whether to revise the draft or finish.
+    """
+    # Same reasoning: cap before content. Two revisions is where returns
+    # stop and the model starts rewording rather than fixing.
+    if state["revision_attempts"] >= 2:
+        return END
+
+    # Empty critique means the critic found nothing wrong.
+    if not state["critique"]:
+        return END
+
+    return "write"
+
+
+def build_graph():
+    """
+    Wires the five nodes into the two-loop graph.
+    """
+    g = StateGraph(State)
+
+    g.add_node("rewrite", rewrite_node)
+    g.add_node("retrieve", retrieve_node)
+    g.add_node("grade", grade_node)
+    g.add_node("write", write_node)
+    g.add_node("critique", critique_node)
+
+    g.set_entry_point("rewrite")
+
+    # Linear spine: every query passes through these in order.
+    g.add_edge("rewrite", "retrieve")
+    g.add_edge("retrieve", "grade")
+
+    # Retrieval correction loop: back to rewrite, or forward to write.
+    g.add_conditional_edges("grade", route_after_grade, {
+        "rewrite": "rewrite",
+        "write": "write",
+    })
+
+    g.add_edge("write", "critique")
+
+    # Revision loop: back to write, or done.
+    g.add_conditional_edges("critique", route_after_critique, {
+        "write": "write",
+        END: END,
+    })
+
+    return g.compile()
+
+
+
+
