@@ -99,33 +99,72 @@ appear in an academic paper on this topic."""
 
 
 
-def retrieve_node(state: State):
-    '''
-    Runs the hybrid retrieval pipeline on the current query.
-    Also increments the attempt counter that caps the correction loop.
-    '''
+def retrieve_node(state: State) -> dict:
+    """
+    Runs hybrid retrieval for the current query.
 
-    chunks = retrieve(state["query"])                                           # dense + sparse + RRF + rerank, returns TOP_K chunks
-
-    attempts = state.get("retrieval_attempts", 0) + 1                           # Count this attempt; the router reads this to cap the loop
-
-    return {
-        "chunks": chunks,                                                       # Overwritten each pass, not accumulated
-        "retrieval_attempts": attempts,
-    }
+    All the real work (dense + sparse + RRF + rerank) lives in retriever.py,
+    which already returns plain dicts. This node just parks them in state.
+    """
+    return {"chunks": retrieve(state["query"])}
 
 
 
 
+def format_chunks(chunks: list) -> str:
+    """
+    Turns the chunk list into numbered context for a prompt.
+
+    Numbering matters: the writer and critic both need a way to point at a
+    specific chunk, and "[3]" is something an 8B model produces reliably
+    where a chunk id or a quoted phrase is not.
+    """
+    parts = []
+    for i, c in enumerate(chunks, start=1):
+        p = c["payload"]
+        parts.append(f"[{i}] (from {p['section']})\n{p['text']}")
+    return "\n\n".join(parts)
 
 
 
 
 
+GRADE_SYSTEM = """You judge whether retrieved text can answer a question.
+Answer with exactly one word: YES or NO. Nothing else."""
 
 
+def grade_node(state: State) -> dict:
+    """
+    Decides whether the retrieved chunks are enough to answer the question.
 
+    Each chunk is graded independently with a binary YES/NO. We count the
+    YES votes rather than asking the model to judge the whole set at once.
+    """
+    question = state["question"]
+    chunks = state["chunks"]
 
+    relevant = 0
+    for c in chunks:
+        prompt = f"""Question: {question}
+
+Retrieved text:
+{c["payload"]["text"]}
+
+Does this text contain information useful for answering the question?"""
+
+        answer = llm(prompt, system=GRADE_SYSTEM).strip().upper()
+
+        # Substring check, not equality. The model occasionally emits
+        # "YES." or "YES, it does" despite the instruction, and treating
+        # those as NO would silently poison the verdict.
+        if answer.startswith("Y"):
+            relevant += 1
+
+    # One good chunk is enough to write from. Demanding more sends the loop
+    # off rewriting queries that were actually working.
+    verdict = "sufficient" if relevant >= 1 else "insufficient"
+
+    return {"verdict": verdict}
 
 
 
