@@ -168,7 +168,53 @@ Does this text contain information useful for answering the question?"""
 
 
 
+WRITE_SYSTEM = """You answer questions using only the provided context.
 
+Rules:
+- Use only information from the numbered context passages.
+- Cite every claim with the passage number in square brackets, like [2].
+- If the context does not support an answer, say so plainly.
+- Do not use outside knowledge, even if you are confident it is correct."""
+
+
+def write_node(state: State) -> dict:
+    """
+    Writes the answer from the retrieved chunks.
+
+    Handles both the first draft and revisions. If a critique exists in
+    state, this is a revision pass and the feedback goes into the prompt.
+    """
+    context = format_chunks(state["chunks"])
+    critique = state.get("critique", "")
+
+    if critique:
+        # Revision pass. The model sees its own previous draft and what
+        # was wrong with it, so it can fix specific problems rather than
+        # starting over and possibly losing what was already correct.
+        prompt = f"""Question: {state["question"]}
+
+Context passages:
+{context}
+
+Your previous draft:
+{state["draft"]}
+
+Problems found with that draft:
+{critique}
+
+Rewrite the answer, fixing those problems. Keep what was correct."""
+    else:
+        # First draft.
+        prompt = f"""Question: {state["question"]}
+
+Context passages:
+{context}
+
+Write a clear, well-organised answer to the question."""
+
+    draft = llm(prompt, system=WRITE_SYSTEM)
+
+    return {"draft": draft}
 
 
 
