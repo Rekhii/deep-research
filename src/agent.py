@@ -54,37 +54,48 @@ def llm(prompt, system=None, think=False):
 
 
 
-REWRITE_SYSTEM = (                                       # Module-level constant, sits next to the node that uses it
-    "You rewrite questions into short search queries for a research paper "
-    "database. Output only the query. No explanation, no punctuation at the end."
-)
+# The rewriter only ever sees the question and the last verdict.
+# Keeping the instruction in a system message separates "who you are"
+# from "what to do right now", which qwen3 follows more reliably.
+REWRITE_SYSTEM = """You rewrite search queries for a document retrieval system.
+Output ONLY the rewritten query. No explanation, no quotes, no preamble."""
 
 
-def rewrite_node(state: State):
-    '''
+def rewrite_node(state: State) -> dict:
+    """
     Turns the user's question into a search query.
-    First pass compresses the question. Later passes rewrite it differently
-    because the grader rejected what the previous query found.
-    '''
 
-    attempt = state.get("retrieval_attempts", 0)            # 0 on first pass; .get avoids KeyError before the key exists
+    First pass: use the question as-is, no LLM call.
+    Later passes: rewrite, because the previous query failed to retrieve enough.
+    """
+    attempts = state["retrieval_attempts"]
 
-    if attempt == 0:                                        # Nothing has failed yet, just compress
-        prompt = (
-            f"Question: {state['question']}\n\n"
-            "Write a short search query, 3 to 8 words, capturing the key terms."
-        )
-    else:                                                   # Previous attempt was graded insufficient
-        prompt = (                                          # Feed the failed query in so the model does not repeat it
-            f"Question: {state['question']}\n"
-            f"Previous query that found nothing useful: {state['query']}\n\n"
-            "Write a different search query, 3 to 8 words. Use different wording "
-            "or broader terms than the previous query."
-        )
+    # Attempt 0 is the happy path. The user's own wording is usually the best
+    # query we have, and burning an LLM call to paraphrase it before we know
+    # anything is wrong just adds latency and a chance to lose meaning.
+    if attempts == 0:
+        return {
+            "query": state["question"],
+            "retrieval_attempts": 1,
+        }
 
-    new_query = llm(prompt, system=REWRITE_SYSTEM)      # think=False by default, we want the bare query
+    # We only reach here because the grader said the last retrieval was thin.
+    # So we tell the model what already failed and ask for a different angle.
+    prompt = f"""Original question: {state["question"]}
 
-    return {"query": new_query}                         # Only this key changes; LangGraph merges it into state
+Previous search query: {state["query"]}
+That query did not retrieve enough relevant material.
+
+Write a different search query for the same question. Use alternative
+terminology, synonyms, or more specific technical vocabulary that would
+appear in an academic paper on this topic."""
+
+    new_query = llm(prompt, system=REWRITE_SYSTEM)
+
+    return {
+        "query": new_query,
+        "retrieval_attempts": attempts + 1,
+    }                                             # Only this key changes; LangGraph merges it into state
 
 
 
@@ -94,12 +105,12 @@ def retrieve_node(state: State):
     Also increments the attempt counter that caps the correction loop.
     '''
 
-    chunks = retrieve(state["query"])                       # dense + sparse + RRF + rerank, returns TOP_K chunks
+    chunks = retrieve(state["query"])                                           # dense + sparse + RRF + rerank, returns TOP_K chunks
 
-    attempts = state.get("retrieval_attempts", 0) + 1       # Count this attempt; the router reads this to cap the loop
+    attempts = state.get("retrieval_attempts", 0) + 1                           # Count this attempt; the router reads this to cap the loop
 
     return {
-        "chunks": chunks,                                   # Overwritten each pass, not accumulated
+        "chunks": chunks,                                                       # Overwritten each pass, not accumulated
         "retrieval_attempts": attempts,
     }
 
