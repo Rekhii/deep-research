@@ -219,8 +219,57 @@ Write a clear, well-organised answer to the question."""
 
 
 
+# Critique
+
+CLAIM_SYSTEM = """You extract factual claims from text.
+Output one claim per line. No numbering, no bullets, no commentary.
+Each line must be a single standalone factual statement."""
+
+CHECK_SYSTEM = """You verify whether a claim is supported by context.
+Answer with exactly one word: YES or NO. Nothing else."""
 
 
+def critique_node(state: State) -> dict:
+    """
+    Checks the draft's claims against the retrieved context.
 
+    Two stages: split the draft into individual claims, then verify each
+    one separately. Unsupported claims become the critique that the write
+    node uses on its revision pass.
+    """
+    draft = state["draft"]
+    context = format_chunks(state["chunks"])
+    attempts = state.get("revision_attempts", 0)
+
+    # Stage 1: decompose the draft into checkable statements.
+    claims_raw = llm(
+        f"Extract the factual claims from this text:\n\n{draft}",
+        system=CLAIM_SYSTEM,
+    )
+    claims = [c.strip() for c in claims_raw.split("\n") if c.strip()]
+
+    # Stage 2: verify each claim independently against the context.
+    unsupported = []
+    for claim in claims:
+        prompt = f"""Context:
+{context}
+
+Claim: {claim}
+
+Is this claim supported by the context above?"""
+
+        answer = llm(prompt, system=CHECK_SYSTEM).strip().upper()
+        if not answer.startswith("Y"):
+            unsupported.append(claim)
+
+    # No problems found means the draft is done and the loop exits.
+    if not unsupported:
+        return {"critique": "", "revision_attempts": attempts + 1}
+
+    critique = "These claims are not supported by the context:\n" + "\n".join(
+        f"- {c}" for c in unsupported
+    )
+
+    return {"critique": critique, "revision_attempts": attempts + 1}
 
 
