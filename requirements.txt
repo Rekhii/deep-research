@@ -6,3 +6,4 @@ ollama
 streamlit
 numpy
 tqdm
+pytest
