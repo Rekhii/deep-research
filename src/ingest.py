@@ -63,8 +63,13 @@ def clean(md):
     md = md.replace("**", "")                                               # Remove bold markers
     md = re.sub(r"(?<!\w)_|_(?!\w)", "", md)                    # Remove italic markers, keep underscores inside words
     md = re.sub(r"\n{3,}", "\n\n", md)                          # Collapse runs of blank lines to a single break
-    md = re.sub(r"(?<![\w.])\d(?=[A-Z][a-z]|[A-Z]{3})", "", md)         # Strip glued leading digit
+    md = re.sub(r"(?<![\w.])\d(?=[A-Z][a-z]|[A-Z]{3})", "", md) # Strip glued leading digit
     md = re.sub(r"\bLIDA[A-Za-z]{1,2}(?![A-Za-z])", "LIDA", md) # Strip glued trailing marker
+    md = re.sub(
+        r"(?<=\.)\s+(?=[IVXLC]+\.\s+[A-Z]{2,}(?:\s+[A-Z]{2,})+)",
+        "\n\n## ",
+        md,
+    )
 
     return md
 
