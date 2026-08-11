@@ -54,6 +54,19 @@ def main():
             print(f"query used:         {final['query']}")
             print(f"retrieval attempts: {final['retrieval_attempts']}")
             print(f"revision attempts:  {final['revision_attempts']}")
+    except ConnectionError:
+        # ollama.chat raises this when the daemon is not reachable. Without
+        # catching it the user gets 25 lines of LangGraph internals ending in
+        # a message that looks like this project is broken, when the actual
+        # problem is a missing prerequisite.
+        print()
+        print("Could not reach Ollama.")
+        print()
+        print("  1. Start it:   ollama serve")
+        print("  2. Check the model is pulled:   ollama list")
+        print("     If qwen3:8b is missing:      ollama pull qwen3:8b")
+        raise SystemExit(1)
+
     finally:
         # Embedded Qdrant is single-writer and holds a lock on the folder.
         # Without this, an unclean exit leaves the lock held and the next
