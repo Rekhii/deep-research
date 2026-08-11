@@ -1,0 +1,189 @@
+﻿==============================================================================
+q01  [lexical]
+Q: What does the LIDA acronym stand for?
+
+  --- chunk_index=14  section=I. INTRODUCTION
+      LIDA computational framework. That being said, LIDA implementations exist for most memory modules,
+      > 1 LIDA is an acronym for Learning Intelligent Distribution Agent (Learning IDA), where IDA is a software personnel agent hand-crafted for the US Navy that automates the process of finding new billets (jobs) for sailors at the end of a tour of duty. LIDA adds learning to IDA and extend its architecture in many other ways
+      > 2 While the LIDA model seems modular, it makes no commitment to modularity in the underlying neural mechanisms.
+      and for some learning mechanisms (see Sections VI and XI).
+
+==============================================================================
+q02  [paraphrase]
+Q: What must every autonomous agent do continually, according to the core idea behind LIDA?
+
+  --- chunk_index=5  section=I. INTRODUCTION
+      [5], we argue that LIDA is a plausible candidate for a unified theoretical framework of cognition.
+      The fundamental principle guiding LIDA is that every autonomous agent [6], be it human, animal or artificial (e.g., software agent, robot), must frequently and continually sense its environment, interpret what it senses, and then act. Ecological psychologists and cognitive neuroscientists refer to this as the action-perception cycle [7, 8]. An agent must select appropriate actions to further its goals, depending on affordances in its environment. Thus, action selection is central to cognition (see the action selection paradigm [9]) and is the overriding task of every broad cognitive architecture, e.g., SOAR [10], ACT-R [11], CLARION [12], etc.
+
+==============================================================================
+q03  [lexical]
+Q: Which theory of consciousness is LIDA primarily based on?
+
+  --- chunk_index=21  section=II. LIDA MODEL, ITS RELATIONS, AND DESIGN PRINCIPLES
+      The LIDA model is a conceptual and partially implemented computational model that makes an attempt to cover a large portion of human cognition. It is largely based on BaarsΓÇÖ Global Workspace Theory (GWT) [22, 39, 40], a conceptual theory of the role of consciousness<sup>3</sup> (specifically the attentional component<sup>4</sup> ) in cognition. Originally conceived as a neuropsychological model of conscious and unconscious processes [22], GWT has been broadened in LIDA into a higher-level theory of human cognitive processing [31]. Now supported by considerable empirical evidence [40], GWT views the nervous system as a distributed parallel system with many different specialized processes.
+
+==============================================================================
+q04  [lexical]
+Q: How many design principles does LIDA have, and how many have been implemented computationally?
+
+  --- chunk_index=28  section=II. LIDA MODEL, ITS RELATIONS, AND DESIGN PRINCIPLES
+      the Schema Mechanism [54, 55], the Behavior Net [56, 57], and the Subsumption Architecture [58].
+      Please note that whenever we mention that our model accounts for some mental phenomenon, and use terms from cognitive science, we do not mean to imply that LIDA is able to account for the full psychological complexity underlying these terms. Rather, we mean to say that these mental phenomena fit into and are part of the LIDA model. If implemented as part of LIDA, their computational counterparts are functionally similar but very simple abstractions as is the case with most computational models. It is important to emphasize some design principles that underlie the LIDA model (but are not necessarily unique to LIDA ΓÇô see Section XI for comparisons with other cognitive architectures). Six such principles are discussed below.
+
+  --- chunk_index=29  section=II. LIDA MODEL, ITS RELATIONS, AND DESIGN PRINCIPLES
+      XI for comparisons with other cognitive architectures). Six such principles are discussed below.
+      The first four principles have been implemented in the computational LIDA framework, while the last two are still conceptual.
+
+==============================================================================
+q05  [paraphrase]
+Q: Are there any points in LIDA where processing has to happen in a fixed order rather than in parallel?
+
+  --- chunk_index=33  section=II. LIDA MODEL, ITS RELATIONS, AND DESIGN PRINCIPLES
+      are fully grounded, in the sense of using only modal representations (see [64] and Section XI).
+      Asynchronous operation. Second, with the exception of two serial decision points controlled by triggers (to be described below), the model operates entirely asynchronously . That is, no process waits for its turn to proceed, but rather each process operates whenever its conditions are satisfied. LIDAΓÇÖs asynchronous processes implement concurrent and distributed information processing, features which are vitally important when dealing with highly complex perceptual inputs with limited resources [65].
+
+==============================================================================
+q06  [lexical]
+Q: What are the three phases of the LIDA cognitive cycle?
+
+  --- chunk_index=41  section=III. THE LIDA COGNITIVE CYCLE
+      The LIDA model and its ensuing architecture are grounded in the LIDA cognitive cycle. The agentΓÇÖs ΓÇ£lifeΓÇ¥ can be viewed as consisting of a continual sequence of these cognitive cycles. Each cycle consists of three phases, an understanding phase, an attending phase, and an action selection phase. LIDAΓÇÖs cognitive cycles closely resemble action-perception cycles in neuroscience [8, 77], and also bear some similarity to execution cycles in other cognitive architectures [10, 16, 70]. A cognitive cycle can be thought of as a cognitive ΓÇ£momentΓÇ¥. As will be described in Section V below, higher-level cognitive processes are composed of many of these cognitive cycles, each a cognitive ΓÇ£atom.ΓÇ¥
+
+==============================================================================
+q07  [lexical]
+Q: What are structure-building codelets and what do they do?
+
+  --- chunk_index=48  section=III. THE LIDA COGNITIVE CYCLE
+      model. This assembling process will typically require structure-building codelets<sup>7</sup> .
+      These structure-building codelets are small, special-purpose processors, each of which has some particular type of structure it is designed to build. These codelets are continually monitoring the Workspace for opportunities to fulfill their particularly specified task. They may draw upon perceptual memory and even sensory memory to enable the recognition of relations and situations, and of analogies and similarities (inspired by [50, 51]). The newly assembled model constitutes the agentΓÇÖs understanding of its current situation within its world. It has made sense of the incoming stimuli and the understanding phase is complete.
+
+==============================================================================
+q08  [paraphrase]
+Q: How does LIDA decide which part of its current model reaches consciousness?
+
+  --- chunk_index=50  section=III. THE LIDA COGNITIVE CYCLE
+      or running piece of software code. Codelets correspond to processors in Global Workspace Theory.
+      of the model compete for attention. These competing portions take the form of coalitions of structures from the model. Such coalitions are formed by special-purpose attention codelets, whose function is to bring certain perceptual structures of concern to the particular attention codelet into the Global Workspace (hence the name Global Workspace Theory). The coalition containing the most salient (important, urgent, insistent, novel, threatening, promising, arousing, unexpected) perceptual structures wins the competition. In effect, the agent has decided on what to attend. A representation of the contents of the winning coalition is then broadcast globally bringing its contents to consciousness and, thereby, completing the attending phase of the cycle.
+
+==============================================================================
+q09  [paraphrase]
+Q: What term describes action selection that is influenced by conscious content but carried out unconsciously within one cycle?
+
+  --- chunk_index=58  section=IV. TYPES OF DECISION MAKING AND ACTION SELECTION
+      is based, but the selection itself is done unconsciously after the conscious broadcast [36].
+      We refer to this very typical single-cycle process as consciously mediated action selection .
+      LIDAΓÇÖs predecessor IDA had computational implementations for all of the described decision-making types [30, 67]. In LIDA, computational development is still underway. Consciously mediated action selection and action execution are currently implemented as discussed below. Section V describes LIDAΓÇÖs conceptual designs for the other types.
+
+==============================================================================
+q10  [multi]
+Q: Which psychological theory does LIDA use to model volitional decision making, and how is it illustrated?
+
+  --- chunk_index=62  section=V. HIGHER-LEVEL COGNITIVE PROCESSES AND LEVELS OF CONTROL IN LIDA
+      ΓÇ£No, it's too sweet,ΓÇ¥ asserts an objector. ΓÇ£How about a beer?ΓÇ¥ says a different proposer.
+      ΓÇ£Too early in the day,ΓÇ¥ says another objector. ΓÇ£Orange juice is more nutritious,ΓÇ¥ says a supporter. With no further objections, drinking orange juice is volitionally selected.
+
+  --- chunk_index=63  section=V. HIGHER-LEVEL COGNITIVE PROCESSES AND LEVELS OF CONTROL IN LIDA
+      says a supporter. With no further objections, drinking orange juice is volitionally selected.
+      Baars incorporated ideomotor theory directly into his GWT [22]. The LIDA model fleshes out volitional decision making via ideomotor theory within GWT [30] as follows. An idea ΓÇ£popping into mindΓÇ¥ in the LIDA model is accomplished by the idea being part of the conscious broadcast during a cognitive cycle, that is, part of the contents of consciousness for that cognitive moment. These contents are the information (structures) contained within the winning coalition for that cycle. This winning coalition was gathered by some attention codelet (see Section III above).
+
+==============================================================================
+q11  [paraphrase]
+Q: Besides choosing to act, what other kinds of high-level thinking does LIDA handle with an internal virtual reality?
+
+  --- chunk_index=68  section=V. HIGHER-LEVEL COGNITIVE PROCESSES AND LEVELS OF CONTROL IN LIDA
+      the process and choosing an alternative if it has gone on for too long (see [30] for details).
+      In addition to volition, deliberative processing is also involved in other higher-level cognitive processes such as planning, scheduling, and problem solving. Deliberative information processing and decision making allows an agent to function flexibly within a complicated niche in a complex, dynamic environment. Such deliberative processes in humans, and in some other animals, are typically performed in an internally constructed virtual reality. An internal virtual reality for deliberation requires a short-term memory in which temporary structures can be constructed with which to ΓÇ£mentallyΓÇ¥ try out possible actions without actually executing them. In the LIDA model the virtual window of the perceptual scene in the Workspace serves just such a function [79].
+
+==============================================================================
+q12  [lexical]
+Q: What are the modes of learning in the LIDA model?
+
+  --- chunk_index=71  section=VI. LEARNING IN LIDA
+      to understanding the role played by feelings and emotions in the LIDA model (see section VII).
+      Learning in the LIDA model can only occur after information has been attended to, that is, broadcast from the Global Workspace. The LIDA model realizes several fundamental learning mechanisms (modes), each in two types, which underlie much of human learning. The two types are instructionalist (i.e., learning by the creation of new representations) and selectionist (i.e., learning by the reinforcement of existing representations) [25]. The modes of learning in the model include perceptual , episodic , and procedural .
+
+  --- chunk_index=72  section=VI. LEARNING IN LIDA
+      [25]. The modes of learning in the model include perceptual , episodic , and procedural .
+      10 Alternatively, this node could arrive in the Workspace with the percept of the following cycle as a result of internal sensing of the internal speech. In LIDA, this is only an implementation matter, making no functional difference. In humans this is an empirical matter to be decided by experiment. Thus the design decision for LIDA becomes a cognitive hypothesis.
+      11 Internal actions are part of the LIDA model, but have not been implemented yet.
+
+==============================================================================
+q13  [multi]
+Q: What has to happen before an agent can learn anything in LIDA?
+
+  --- chunk_index=71  section=VI. LEARNING IN LIDA
+      to understanding the role played by feelings and emotions in the LIDA model (see section VII).
+      Learning in the LIDA model can only occur after information has been attended to, that is, broadcast from the Global Workspace. The LIDA model realizes several fundamental learning mechanisms (modes), each in two types, which underlie much of human learning. The two types are instructionalist (i.e., learning by the creation of new representations) and selectionist (i.e., learning by the reinforcement of existing representations) [25]. The modes of learning in the model include perceptual , episodic , and procedural .
+
+  --- chunk_index=79  section=VI. LEARNING IN LIDA
+      the strength of the reinforcement influenced by the strength of the affect (procedural learning).
+      Most of LIDAΓÇÖs learning mechanisms are conceptual at this stage. Implementations exist for procedural learning [76] and episodic learning [92]. Spatial learning is currently being developed for possible robotic applications of LIDA. Perceptual associative learning is currently being implemented in a LIDA-based infant vervet monkey agent that learns predator alarm calls. Additional modes of learning are in the planning stage for later implementation into the LIDA architecture. These include learning of motor plans in Sensory-Motor Memory for the execution of actions, the attentional learning of new attention codelets, and the learning of new structure-building codelets.
+
+==============================================================================
+q14  [paraphrase]
+Q: How does LIDA distinguish an emotion from a feeling?
+
+  --- chunk_index=88  section=VII. FEELINGS AND EMOTIONS IN LIDA
+      thus comes to consciousness, the feeling of being thirsty is experienced<sup>12</sup> by the agent.
+      As stated above, emotions in LIDA are taken to be feelings with cognitive content [99], for example, the fear of a truck bearing down, the shame at something said, the sadness at a loss, or the surprise at an unexpected turn of events. Feelings, including emotions, are represented by nodes in LIDAΓÇÖs Perceptual Associative Memory (PAM). Cognitive content, represented by node/link structures, are linked to emotion nodes by a process called appraisal [106].
+
+==============================================================================
+q15  [multi]
+Q: What mechanism connects a representation of an event to an emotion in LIDA?
+
+  --- chunk_index=89  section=VII. FEELINGS AND EMOTIONS IN LIDA
+      by node/link structures, are linked to emotion nodes by a process called appraisal [106].
+      Appraisal in LIDA. In LIDA, appraisal of a new event, and its connection to an appropriate emotion, is performed by appraisal codelets<sup>13</sup> , a form of structure-building codelet, acting within LIDAΓÇÖs Workspace. Appraisal codelets identify an emotion as well as an arousal level (see below), in the form of an emotion PAM node, and connect this node to the perceptual structure representing the event causing the emotion. The appraisal process can also alter previously
+      > 12In the sense of functional consciousness. We make no commitment in our LIDA model to phenomenal consciousness.
+
+  --- chunk_index=93  section=VII. FEELINGS AND EMOTIONS IN LIDA
+      An emotion PAM node is spawned and connected to this representation by an appraisal codelet.
+      Thus, these codelets implement the Appraisal Derivation Model and the Affect Derivation Model in Marsella et al.ΓÇÖs terminology [98] by creating the emotion node, and the Affect Intensity Model by creating and weighting the links to the Workspace node structures representing appraisal variables, which will ultimately determine the activation (or arousal) of the emotion node.
+
+==============================================================================
+q16  [paraphrase]
+Q: On what basis are LIDA's modules assigned to brain areas?
+
+  --- chunk_index=122  section=VIII. LIDA AND THE UNDERLYING NEURAL PROCESSES
+      plausibility of such an implementation, or of our mapping of LIDA modules to brain areas [123].
+      LIDAΓÇÖs modules can be tentatively assigned neural correlates, based on functional correspondences. This mapping is tentative because the empirical neuroscience evidence is still changing. Such correlates should be interpreted as being involved with the activity of the corresponding LIDA module or process, rather than as being equivalent to it. The correspondence of module to brain correlates is often one-tomany, since a single LIDA module may be implemented by numerous, disparate cell assemblies in brains. Do note that the LIDA model, being described in terms of modules and processes, makes no commitment to the underlying neural structure being modular or localized, as is exemplified in the following paragraphs.
+
+==============================================================================
+q17  [multi]
+Q: How does LIDA's approach to neural mapping differ from ACT-R's?
+
+  --- chunk_index=128  section=VIII. LIDA AND THE UNDERLYING NEURAL PROCESSES
+      comprehensive overview of neural mappings of LIDA modules and processes see the tables in [123].
+      In contrast to LIDA, some other cognitive architectures and models have attempted to directly correlate the activity in their modules to brain areas, and have presented evidence for the neuronal counterparts of their modules based on brain imaging data [162]. For example, ACT-R has been successful in predicting fMRI activation in tasks such as algebraic problem solving [163] or mathematical reasoning [164]. The neuronal correlates underlying ACT-RΓÇÖs modules that have been substantiated using such fMRI studies include the fusiform gyrus (visual), posterior parietal cortex (imaginal), anterior cingulate cortex (goal/control), lateral inferior prefrontal cortex (retrieval), caudate nucleus in the basal ganglia (procedural) and the motor cortex (manual) [165, 166].
+
+  --- chunk_index=129  section=VIII. LIDA AND THE UNDERLYING NEURAL PROCESSES
+      caudate nucleus in the basal ganglia (procedural) and the motor cortex (manual) [165, 166].
+      Apart from substantiation of their claims with neural imaging methods, another difference between LIDAΓÇÖs and ACT-RΓÇÖs neural mapping is that ACT-R assumes a strictly modular organization of the brain, with functional one-on-one mappings to individual areas, a view that has some challenges based on empirical results [137, 167, 168]. Anderson et al. [166] also point out that there is some evidence against the prediction arising from this mapping that the basal ganglia (as the counterpart of ACT-RΓÇÖs production system) is the sole path of communication between different cortical areas. This evidence includes observed cortical-to-cortical connections (e.g.
+
+==============================================================================
+q18  [paraphrase]
+Q: How do modules pass information to each other in the LIDA Framework?
+
+  --- chunk_index=139  section=IX. THE LIDA COMPUTATIONAL FRAMEWORK
+      Task Manager, achieving parallel execution in a way that is approximately transparent to the user.
+      Modules need to communicate with other modules. To implement this, we use the Observer design pattern [176]. In short, a module, called the ΓÇ£listener,ΓÇ¥ which receives information from another ΓÇ£producerΓÇ¥ module, can register itself with the producer as a listener. Each time the producer has something to send, it transmits the information to all of its registered listeners. There are numerous instances of listeners in the Framework. One module can be registered as a listener of several other modules. Also a module can be a producer and a listener of other modules at the same time.
+
+==============================================================================
+q19  [lexical]
+Q: What was the average cognitive cycle duration measured for the LRT agent?
+
+  --- chunk_index=155  section=X. LIDA-BASED SOFTWARE AGENTS
+      set to the appropriate value by a snippet of code that could be called the LRT agentΓÇÖs ΓÇ£actuator.ΓÇ¥
+      The cognitive cycle durations of the LRT agent (283 ms averaged over 30 runs, see [69]) are comparable, but larger than the cycle durations inferred from the reaction times of adult humans (200ms according to [192]). This is consistent with recent neuroscientific evidence (e.g. [154, 193, 194], see also [69]) supporting the idea that single perception-action cycles may take longer than simple reaction time tasks under normal circumstances (e.g. more complex stimuli). We hypothesize that the main reason for humans being faster at such experiments is the effect of temporal expectation, which reduces reaction time (and has not yet been implemented in LIDA). A behavioral consequence of this is that reaction times to predictable stimuli are significantly lower than
+
+==============================================================================
+q20  [paraphrase]
+Q: In what sense can LIDA be viewed as a blackboard system?
+
+  --- chunk_index=193  section=XI. CONTRASTING LIDA WITH MAJOR COGNITIVE ARCHITECTURES
+      partial solutions, and a scheduling/control structure that regulates the writing to the blackboard.
+      The LIDA model can be viewed as a blackboard system with its Workspace serving as the blackboard, each of the other memories and their processes acting as knowledge sources, and the attention/consciousness system constituting the scheduling/control structure. Note that unlike a typical blackboard system, LIDA models cognition, rather than being devoted to the solution of one problem.
+
+==============================================================================
+# 206 chunks in collection

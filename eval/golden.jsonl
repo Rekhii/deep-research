@@ -1,0 +1,20 @@
+{"qid": "q01", "question": "What does the LIDA acronym stand for?", "gold_ids": [14], "difficulty": "lexical"}
+{"qid": "q02", "question": "What must every autonomous agent do continually, according to the core idea behind LIDA?", "gold_ids": [5], "difficulty": "paraphrase"}
+{"qid": "q03", "question": "Which theory of consciousness is LIDA primarily based on?", "gold_ids": [21], "difficulty": "lexical"}
+{"qid": "q04", "question": "How many design principles does LIDA have, and how many have been implemented computationally?", "gold_ids": [28, 29], "difficulty": "lexical"}
+{"qid": "q05", "question": "Are there any points in LIDA where processing has to happen in a fixed order rather than in parallel?", "gold_ids": [33], "difficulty": "paraphrase"}
+{"qid": "q06", "question": "What are the three phases of the LIDA cognitive cycle?", "gold_ids": [41], "difficulty": "lexical"}
+{"qid": "q07", "question": "What are structure-building codelets and what do they do?", "gold_ids": [48], "difficulty": "lexical"}
+{"qid": "q08", "question": "How does LIDA decide which part of its current model reaches consciousness?", "gold_ids": [50], "difficulty": "paraphrase"}
+{"qid": "q09", "question": "What term describes action selection that is influenced by conscious content but carried out unconsciously within one cycle?", "gold_ids": [58], "difficulty": "paraphrase"}
+{"qid": "q10", "question": "Which psychological theory does LIDA use to model volitional decision making, and how is it illustrated?", "gold_ids": [62, 63], "difficulty": "multi"}
+{"qid": "q11", "question": "Besides choosing to act, what other kinds of high-level thinking does LIDA handle with an internal virtual reality?", "gold_ids": [68], "difficulty": "paraphrase"}
+{"qid": "q12", "question": "What are the modes of learning in the LIDA model?", "gold_ids": [71], "difficulty": "lexical"}
+{"qid": "q13", "question": "What has to happen before an agent can learn anything in LIDA?", "gold_ids": [71], "difficulty": "paraphrase"}
+{"qid": "q14", "question": "How does LIDA distinguish an emotion from a feeling?", "gold_ids": [88], "difficulty": "paraphrase"}
+{"qid": "q15", "question": "What mechanism connects a representation of an event to an emotion in LIDA?", "gold_ids": [89, 93], "difficulty": "multi"}
+{"qid": "q16", "question": "On what basis are LIDA's modules assigned to brain areas?", "gold_ids": [122], "difficulty": "paraphrase"}
+{"qid": "q17", "question": "How does LIDA's approach to neural mapping differ from ACT-R's?", "gold_ids": [128, 129], "difficulty": "multi"}
+{"qid": "q18", "question": "How do modules pass information to each other in the LIDA Framework?", "gold_ids": [139], "difficulty": "paraphrase"}
+{"qid": "q19", "question": "What was the average cognitive cycle duration measured for the LRT agent?", "gold_ids": [155], "difficulty": "lexical"}
+{"qid": "q20", "question": "In what sense can LIDA be viewed as a blackboard system?", "gold_ids": [193], "difficulty": "paraphrase"}

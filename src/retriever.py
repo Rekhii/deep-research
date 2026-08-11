@@ -1,10 +1,12 @@
 from qdrant_client import QdrantClient, models
 from fastembed import TextEmbedding, SparseTextEmbedding
 from fastembed.rerank.cross_encoder import TextCrossEncoder
+from src.config import CANDIDATES
 from src.config import (
     QDRANT_PATH,
     COLLECTION,
     DENSE_MODEL,
+    USE_RERANKER,
     SPARSE_MODEL,
     CANDIDATES,
     RERANK_MODEL,
@@ -174,7 +176,7 @@ def rerank(query, candidates, limit=TOP_K):
 
 
 
-def retrieve(query, candidates=CANDIDATES, top_k=TOP_K):
+def retrieve(query, candidates=CANDIDATES, top_k=TOP_K, use_reranker=USE_RERANKER):
     """
     Full retrieval pipeline: hybrid search, RRF fusion, cross-encoder rerank.
     Returns the top_k most relevant chunks.

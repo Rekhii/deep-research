@@ -70,6 +70,10 @@ def clean(md):
         "\n\n## ",
         md,
     )
+    for notice in BOILERPLATE:
+        md = md.replace(notice, "")
+
+    md = re.sub(r"\n{3,}", "\n\n", md)                          # Re-collapse gaps left behind by the removals
 
     return md
 
@@ -189,7 +193,23 @@ def file_hash(path):
 
     return h.hexdigest()[:16]                                 # Convert hash to text and return only the first 16 characters
 
+BOILERPLATE = [
+    "Copyright (c) 2014 IEEE. Personal use is permitted.",
+    "For any other purposes, permission must be obtained from the IEEE by emailing pubs-permissions@ieee.org.",
+    "This is the author's version of an article that has been published in this journal.",
+    "Changes were made to this version by the publisher prior to publication.",
+    "The final version of record is available at http://dx.doi.org/10.1109/TAMD.2013.2277589",
+]
 
+BOILERPLATE_THRESHOLD = 0.8
+
+def is_boilerplate(text):
+    stripped = text.strip()
+    if not stripped:
+        return True                                   # Empty chunks are never worth indexing
+
+    hits = sum(len(p) for p in BOILERPLATE if p in stripped)
+    return hits / len(stripped) > BOILERPLATE_THRESHOLD
 
 def iter_chunks(pdf_path):
     '''
@@ -208,6 +228,9 @@ def iter_chunks(pdf_path):
 
         for text in chunk_section(body):                      # Split each section body into smaller searchable chunks
 
+            if is_boilerplate(text):                          # Drop chunks that are almost entirely IEEE notice text
+                continue                                      # Skipped before numbering, so chunk_index stays contiguous
+
             payload = {                                       # Metadata stored together with each chunk
                 "paper": paper,                               # Paper name
                 "section": title,                             # Section where this chunk came from
@@ -218,7 +241,6 @@ def iter_chunks(pdf_path):
 
             yield text, payload                               # Return one chunk and its metadata at a time
             index += 1                                        # Move to the next chunk number
-
 
 def find_pdfs():
     '''

@@ -31,10 +31,10 @@ CHUNK_OVERLAP = 100                          # Amount of information repeated be
 
 # Retrieval Settings
 COLLECTION = "papers"                        # Name of the Qdrant collection where your research-paper vectors/data are stored.
-CANDIDATES = 50                              # Number of possible relevant chunks you initially retrieve before final filtering/reranking.
+CANDIDATES = 25                              # Number of possible relevant chunks you initially retrieve before final filtering/reranking.
 RRF_K = 60                                   # It controls how strongly ranking positions affect the fusion.
 TOP_K = 5                                    # Final number of highest-ranked chunks you keep/send onward.
-
+USE_RERANKER = False
 
 
 
